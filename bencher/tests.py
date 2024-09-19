@@ -1,7 +1,6 @@
 import asyncio
 import time
 import tracemalloc
-from utils import TimeLockInstance
 
 from security_prompts import check_malicious, score_malicious
 
@@ -35,7 +34,7 @@ async def _bench_check_malicious(meta_task, runs, cyphers=None):
     
     tasks = []
     for i in range(0, runs):
-        print(f"ROUND {i}")
+        print(f"{__name__}--ROUND {i}")
         for query, expected in cyphers:
             tasks.append(asyncio.create_task(check_malicious(query)))
     
@@ -96,7 +95,7 @@ async def _bench_score_malicious(meta_task, runs, cyphers=None):
     
     tasks = []
     for i in range(0, runs):
-        print(f"ROUND {i}")
+        print(f"{__name__}--ROUND {i}")
         for query, expected in cyphers:
             tasks.append(asyncio.create_task(score_malicious(query, 0.8, meta_task)))
     
@@ -131,13 +130,11 @@ async def _bench_score_malicious(meta_task, runs, cyphers=None):
 
     return meta_task()
 
-async def _test_token_bucket_30_rpm(meta_task, runs, cyphers=None):
-    t0 = time.time_ns()
-    
-    tasks = []
-    for i in range(0, runs):
-        
-        print(meta_task)
+async def _test_bucket_rate_limit_30(meta_task, runs, cyphers=None):
+    pass
+    """
+        Todo
+    """
 
 
 

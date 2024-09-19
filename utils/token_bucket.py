@@ -1,4 +1,3 @@
-import asyncio
 import time
 
 class TokenBucket:
@@ -16,7 +15,6 @@ class TokenBucket:
             self.current_tokens = capacity  # Current tokens
             self.last_refill_time = time.time()  # Last time tokens were refilled
             self.initialized = True
-            asyncio.create_task(self.start_refill())  # Start the refill task
 
     async def refill(self):
         """Refills the bucket based on the time elapsed."""
@@ -31,11 +29,8 @@ class TokenBucket:
             self.current_tokens = min(self.capacity, self.current_tokens + tokens_to_add)
             self.last_refill_time = now
 
-    async def start_refill(self):
-        """Starts a loop to refill the bucket periodically."""
-        while True:
-            await asyncio.sleep(1)  # Wait for 1 second between refills
-            await self.refill()  # Refill tokens periodically
+    async def set_refill_rate(self, tpm):
+        self.refill_rate = tpm / 60
 
     async def get_tokens(self, tokens_needed):
         """Try to get tokens from the bucket."""
@@ -48,4 +43,5 @@ class TokenBucket:
             return False  # Not allowed to send
 
 # Global singleton instance of the TokenBucket
-bucket_instance = TokenBucket(capacity=10, refill_rate=5)
+bucket_instance_groq = TokenBucket(capacity=28, refill_rate=0)
+bucket_instance_test = TokenBucket(capacity=28, refill_rate=0)
