@@ -12,9 +12,12 @@ class TimeLockInstance:
         self.meta_task = meta_task
         
     async def tiktime(self):
+        self.meta_task["tiktime-t0"] = time.time_ns()
 
         global sleep_duration 
         global time_lock
+        
+        iii = 0x00
 
         while 0x01:
             current_time = time.time_ns()
@@ -27,9 +30,13 @@ class TimeLockInstance:
                 next_time = max(next_time, current_time) + 60 / rpm
 
             if sleep_duration > 0:
+                self.meta_task[f"tiktime-sleep-{iii}"] = sleep_duration
                 await asyncio.sleep(sleep_duration)
 
             elif sleep_duration <= 0:
+                self.meta_task["tiktime-bfbr"] = time.time_ns()
                 break
+
+            iii+=1
 
         return self.meta_task
