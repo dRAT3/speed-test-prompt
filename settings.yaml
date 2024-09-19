@@ -1,0 +1,6 @@
+buckets:
+  - name: bucket_instance_groq
+    tpm: 30 
+  - name: bucket_instance_test
+    tpm: 30
+
