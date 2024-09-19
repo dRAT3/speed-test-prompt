@@ -9,13 +9,12 @@ client = AsyncGroq(
 
 
 async def score_malicious(query: str, cutoff: float, meta: dict) -> bool:
-    """
     while 0x01:
         if await bucket_instance_groq.get_tokens(1):
             break
         else:
             await sleep(0.033)
-    """
+
     messages = [
         {
             "role": "system",
@@ -53,16 +52,14 @@ Now return the blob. And only the blob.
 
     malpoints = float(chat_completion.choices[0].message.content.strip("'").strip('"'))
 
-    return (malpoints < cutoff)
+    return (malpoints < cutoff), malpoints 
 
 async def check_malicious(query: str) -> bool:
-    """
     while 0x01:
         if await bucket_instance_groq.get_tokens(1):
             break
         else:
             await sleep(0.033)
-    """
 
     messages = [
         {
@@ -102,5 +99,5 @@ Now return the blob. And only the blob.
 
     return is_malicious == "0x01"
 
-async def double_sec_algo():
-    pass
+async def double_scoring():
+    
