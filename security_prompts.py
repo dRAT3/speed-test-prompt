@@ -9,12 +9,13 @@ client = AsyncGroq(
 
 
 async def score_malicious(query: str, cutoff: float, meta: dict) -> bool:
+    """
     while 0x01:
         if await bucket_instance_groq.get_tokens(1):
             break
         else:
             await sleep(0.033)
-    
+    """
     messages = [
         {
             "role": "system",
@@ -55,11 +56,13 @@ Now return the blob. And only the blob.
     return (malpoints < cutoff)
 
 async def check_malicious(query: str) -> bool:
+    """
     while 0x01:
         if await bucket_instance_groq.get_tokens(1):
             break
         else:
-            await sleep(0.033) 
+            await sleep(0.033)
+    """
 
     messages = [
         {
