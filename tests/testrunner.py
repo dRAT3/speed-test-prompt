@@ -83,7 +83,9 @@ class BenchRunner:
         elapsed = t1 - t0
         print(f"Time elapsed[All Runs]: {elapsed / 1e9} seconds")
 
-    async def scan_file(self):
+    @classmethod
+    async def scan_file(cls):
+        pass
 
 # Usage Example
 # Assuming you have defined global functions for your tests
