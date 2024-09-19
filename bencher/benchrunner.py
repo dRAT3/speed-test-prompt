@@ -5,7 +5,8 @@ import logging
 
 import tracemalloc
 
-from tests.tests import _bench_check_malicious, _bench_score_malicious 
+from bencher.tests import _bench_check_malicious, _bench_score_malicious 
+from bencher.tests import _test_tiktimer_rate_limit_30_rpm
 
 class BenchRunner:
     def __init__(self, tests, rpm, tm = 0x00, runs = 1):

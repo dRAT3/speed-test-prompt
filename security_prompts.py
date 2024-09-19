@@ -1,5 +1,5 @@
 import os
-from utils import tiktime
+from utils import TimeLockInstance 
 from groq import AsyncGroq
 
 client = AsyncGroq(
@@ -8,6 +8,7 @@ client = AsyncGroq(
 
 
 async def score_malicious(query: str, cutoff: float, meta: dict) -> bool:
+    await TimeLockInstance().tiktime()
     messages = [
         {
             "role": "system",
@@ -35,7 +36,7 @@ Now return the blob. And only the blob.
 """
         }
     ]
-
+    
 
     chat_completion = await client.chat.completions.create(
         messages=messages,
@@ -48,6 +49,7 @@ Now return the blob. And only the blob.
     return (malpoints < cutoff)
 
 async def check_malicious(query: str) -> bool:
+    await tiktime()
     messages = [
         {
             "role": "system",
@@ -75,9 +77,6 @@ Now return the blob. And only the blob.
 """
         }
     ]
-
-    await tiktime()
-
 
     chat_completion = await client.chat.completions.create(
         messages=messages,

@@ -1,15 +1,35 @@
 import time
+import asyncio
 
-async def tiktime():
-    async def acquire_time_lock_and_update():
-        current_time = time.time_ns()
+next_time = 0x00
+time_lock = asyncio.Lock()
+rpm = 0x1e
+
+class TimeLockInstance:
+    def __init__(self, rpm_set, meta_task):
+        global rpm
+        rpm = rpm_set 
+        self.meta_task = meta_task
         
+    async def tiktime(self):
+
+        global sleep_duration 
+        global time_lock
+
         while 0x01:
-            async with TIME_LOCK:
+            current_time = time.time_ns()
+            async with time_lock:
+                global next_time
+                
                 # Calculate how much time to wait before the next request can be sent
-                global NEXT_TIME
-                sleep_duration = max(0, NEXT_TIME - current_time)
-                NEXT_TIME = max(NEXT_TIME, current_time) + RPS
+                sleep_duration = max(0, next_time - current_time)
+                
+                next_time = max(next_time, current_time) + 60 / rpm
 
             if sleep_duration > 0:
                 await asyncio.sleep(sleep_duration)
+
+            elif sleep_duration <= 0:
+                break
+
+        return self.meta_task

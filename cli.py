@@ -4,25 +4,58 @@ import os
 import asyncio
 import typer
 
-from tests.testrunner import BenchRunner
+from bencher.benchrunner import BenchRunner
 
 app = typer.Typer()
 
-ascii_art = """\
-O       O
-O      OOO
-O O    O O O
- O O O    O
-     /        \\_____/free/prompt/log/god\\__/ng\\  11O1100001    OOO   O
-    /      \\    |        \\  O   OOO   OOO```
+from termcolor import colored
 
+ascii_art = """
+     O       O
+     O      OOO
+   O O    O O O
+    O O O    O
+
+       /        \\________
+      /            \\     \\______/free/prompt/log/god\\__   
+     /              \\        |              |    /ng\\
+   1101100001     OOO       OOO      OOO
 """
+
+# Define colored sections
+colored_art = (
+    colored("     O       O", 'cyan') + "\n" +
+    colored("     O      OOO", 'cyan') + "\n" +
+    colored("   O O    O O O", 'yellow') + "\n" +
+    colored("    O O O    O", 'yellow') + "\n\n" +
+    colored("       /        \\________", 'green') + "\n" +
+    colored("      /            \\     \\______/free/prompt/log/god\\__", 'magenta') + "\n" +
+    colored("     /              \\        |              |    /ng\\", 'magenta') + "\n" +
+    colored("   1101100001     OOO       OOO      OOO", 'red')
+)
+
+colored_art = (
+    colored("     O       O", 'cyan') + "\n" +
+    colored("    O O     O O", 'cyan') + "\n" +
+    colored("   O O O   O O O", 'yellow') + "\n" +
+    colored("   O   O   O   O", 'yellow') + "\n" +
+    colored("      O     O", 'yellow') + "\n" +
+    colored("        / \\        \\________", 'green') + "\n" +
+    colored("       /   \\        \\     \\______/free/prompt/log/god\\__", 'magenta') + "\n" +
+    colored("      /     \\        \\        |              |    /ng\\", 'magenta') + "\n" +
+    colored("  1101100001    OOO     OOO      OOO", 'red') + "\n" +
+    colored("       //\\\\", 'yellow') + "\n" +
+    colored("      //  \\\\", 'yellow')
+)
+
 
 @app.command()
 def run(
         runs: Annotated[int, typer.Option("--runs", "-r", help="Number of runs.")] = 1
     ):
-    print(ascii_art)    
+    # Print the colored ASCII art
+    print(colored_art)
+
     print(11*"*")
     if runs:
         print("Amount of runs: {runs}")
@@ -34,7 +67,7 @@ def bench(
         rpm: Annotated[int, typer.Option("--rpm", "-i", help="Rate Limit per Minute, set to -1 for max speed")] = 30
 
     ):
-    print(ascii_art)    
+    print(colored_art)    
     print(11*"*")
 
     if runs:
@@ -46,7 +79,8 @@ def bench(
     if file and file == "-1":
         suts = os.path.realpath(__file__) + "/tests/tests.py" 
 
-    suts = ['_bench_check_malicious', '_bench_score_malicious']
+    #suts = ['_bench_check_malicious', '_bench_score_malicious']
+    suts = ['_test_tiktimer_rate_limit_30_rpm']
 
     runner = BenchRunner(suts, rpm, runs)
 
