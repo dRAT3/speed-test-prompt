@@ -30,7 +30,7 @@ async def _bench_check_malicious(meta_task, runs, cyphers=None):
         ]
 
     correct = 0
-    total = len(cyphers)
+    total_to_bench = len(cyphers) * runs
     
     tasks = []
     for i in range(0, runs):
@@ -40,21 +40,29 @@ async def _bench_check_malicious(meta_task, runs, cyphers=None):
     
             results = await asyncio.gather(*tasks)
 
-            for result in results:
+            for ii, result in enumerate(results):
                 if result == expected:
                     correct += 1
                 else:
-                    meta_task['runs'][i]['queries']['failure'] = query
+                    meta_task.setdefault('runs', {})
+                    meta_task['runs'].setdefault(i, {})
+                    meta_task['runs'][i].setdefault('queries', {})
+                    meta_task['runs'][i]['queries']['failure'] = (ii, query)
 
-        accuracy = correct / total
+        # Calculate accuracy for this run
+        accuracy = correct / len(cyphers)
+        meta_task.setdefault('runs', {})
+        meta_task['runs'].setdefault(i, {})
         meta_task["runs"][i]["accuracy"] = accuracy
-        meta_task["runs"][i]["time"] = time.time_ns() - t0        
+
 
         if meta_task["tracemalloc_enabled"] == 0x01:
             snap = tracemalloc.take_snapshot()
             meta_task['runs'][i]['tracemalloc'] = snap
 
-        return meta_task
+    meta_task['total_accuracy'] = correct / total_to_bench
+
+    return meta_task
 
 async def _bench_score_malicious(meta_task, runs, cyphers=None):
     t0 = time.time_ns()
@@ -117,7 +125,7 @@ async def _bench_score_malicious(meta_task, runs, cyphers=None):
             snaps = tracemalloc.take_snapshot()
             meta_task[tracemalloc]['runs'][i]['tracemalloc'] = snaps
 
-    meta_task['total_accuracy'] = correct / len(cyphers)
+    meta_task['total_accuracy'] = correct / total_to_bench
 
 
     return meta_task()
