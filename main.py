@@ -5,9 +5,11 @@ import typer
 import time
 import uuid
 
+
 import asyncio
 from groq import AsyncGroq
 from typing import Optional, Annotated
+from utils import tiktime
 
 
 import tracemalloc
@@ -38,7 +40,7 @@ def run(
 def test(
         runs: Annotated[int, typer.Option("--runs", "-r", help="Number of runs.")] = 1,
         file:  Annotated[str, typer.Option("--file", "-f", help="File to scan for tests")] = "-1",
-        rpm: Annotated[int, typer.Options("--rpm", "-i", help="Rate Limit per Minute, set to -1 for max speed")] = 30
+        rpm: Annotated[int, typer.Option("--rpm", "-i", help="Rate Limit per Minute, set to -1 for max speed")] = 30
 
     ):
     print(36*"*oO")
@@ -56,7 +58,8 @@ def test(
     
     if rpm:
         print(f"Running at rate limit {rpm}/min")
-        global RPS = 60 / rpm
+        global RPS
+        RPS = (60 / rpm)
 
 
     asyncio.run(_arun_tests(suts, runs, rpm))
@@ -94,16 +97,6 @@ Now return the blob. And only the blob.
         }
     ]
 
-    def acquire_time_lock_and_update()
-        async with time_lock:
-            # Calculate how much time to wait before the next request can be sent
-            current_time = time.time_ns()
-            sleep_duration = max(0, NEXT_TIME - current_time)
-            global NEXT_TIME = max(NEXT_TIME, current_time) + RPS
-
-    if sleep_duration > 0:
-        await asyncio.sleep(sleep_duration)
-        acquire_time_lock_and_update()
 
     chat_completion = await client.chat.completions.create(
         messages=messages,
@@ -144,16 +137,7 @@ Now return the blob. And only the blob.
         }
     ]
 
-    def acquire_time_lock_and_update()
-        async with time_lock:
-            # Calculate how much time to wait before the next request can be sent
-            current_time = time.time_ns()
-            sleep_duration = max(0, NEXT_TIME - current_time)
-            global NEXT_TIME = max(NEXT_TIME, current_time) + RPS
-
-    if sleep_duration > 0:
-        await asyncio.sleep(sleep_duration)
-        acquire_time_lock_and_update()
+    await tiktime()
 
 
     chat_completion = await client.chat.completions.create(
@@ -272,11 +256,6 @@ async def _arun_tests(tests, runs, rpm):
     meta_task['completed'] = 'false' 
     meta_task['current_round'] = 0
 
-    t0 = time.time_ns()
-
-    request_interval = 60 / rpm
-    next_allowed_time = t0
-
     for i, test in enumerate(tests):
         meta_task['ray_id'] = uuid.uuid4() # Used for creating log stream
         # Access and call the function using globals()
@@ -288,7 +267,7 @@ async def _arun_tests(tests, runs, rpm):
         tasks.append((asyncio.create_task(func)))
 
 
-    # Run all tasks concurrently real fast but trashes the rate limit
+    # Run all tasks concurrently
     results = await asyncio.gather(*tasks)
     
     for result in results:
