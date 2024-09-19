@@ -131,20 +131,13 @@ async def _bench_score_malicious(meta_task, runs, cyphers=None):
 
     return meta_task()
 
-async def _test_tiktimer_rate_limit_30_rpm(meta_task, runs, cyphers=None):
+async def _test_token_bucket_30_rpm(meta_task, runs, cyphers=None):
     t0 = time.time_ns()
-    meta_task["t0"] = t0
     
     tasks = []
     for i in range(0, runs):
-        sleeper = TimeLockInstance(30, meta_task)
-        tasks.append(asyncio.create_task(sleeper.tiktime()))
-
-    results = await asyncio.gather(*tasks)
-
-    for i, result in enumerate(results):
-        meta_task['runs'].setdefault(i, {})
-        meta_task['runs'][i] = result
+        
+        print(meta_task)
 
 
 

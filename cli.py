@@ -5,6 +5,7 @@ import asyncio
 import typer
 
 from bencher.benchrunner import BenchRunner
+from utils import bucket_instance, 
 
 app = typer.Typer()
 
@@ -34,7 +35,7 @@ colored_art = (
     colored("   1101100001     OOO       OOO      OOO", 'red')
 )
 
-colored_art = (
+colored_art_2 = (
     colored("     O       O", 'cyan') + "\n" +
     colored("    O O     O O", 'cyan') + "\n" +
     colored("   O O O   O O O", 'yellow') + "\n" +
@@ -55,6 +56,7 @@ def run(
     ):
     # Print the colored ASCII art
     print(colored_art)
+    print(colored_art_2)
 
     print(11*"*")
     if runs:
@@ -68,6 +70,7 @@ def bench(
 
     ):
     print(colored_art)    
+    print(colored_art_2)
     print(11*"*")
 
     if runs:

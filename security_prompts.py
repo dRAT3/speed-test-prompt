@@ -1,6 +1,7 @@
 import os
 from utils import TimeLockInstance 
 from groq import AsyncGroq
+from utils import bucket_instance
 
 client = AsyncGroq(
     api_key=os.environ.get("GROQ_API_KEY"),
@@ -8,7 +9,10 @@ client = AsyncGroq(
 
 
 async def score_malicious(query: str, cutoff: float, meta: dict) -> bool:
-    await TimeLockInstance().tiktime()
+    while 0x01:
+        if await bucket_instance.get_tokens(1):
+            break
+    
     messages = [
         {
             "role": "system",
@@ -49,7 +53,10 @@ Now return the blob. And only the blob.
     return (malpoints < cutoff)
 
 async def check_malicious(query: str) -> bool:
-    await tiktime()
+    while 0x01:
+        if await bucket_instance.get_tokens(1):
+            break
+
     messages = [
         {
             "role": "system",

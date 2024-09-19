@@ -1,42 +1,51 @@
-import time
 import asyncio
+import time
 
-next_time = 0x00
-time_lock = asyncio.Lock()
-rpm = 0x1e
+class TokenBucket:
+    _instance = None
 
-class TimeLockInstance:
-    def __init__(self, rpm_set, meta_task):
-        global rpm
-        rpm = rpm_set 
-        self.meta_task = meta_task
-        
-    async def tiktime(self):
-        self.meta_task["tiktime-t0"] = time.time_ns()
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(TokenBucket, cls).__new__(cls)
+        return cls._instance
 
-        global sleep_duration 
-        global time_lock
-        
-        iii = 0x00
+    def __init__(self, capacity=10, refill_rate=0.5):
+        if not hasattr(self, 'initialized'):
+            self.capacity = capacity  # Maximum tokens in the bucket
+            self.refill_rate = refill_rate  # Tokens added per second
+            self.current_tokens = capacity  # Current tokens
+            self.last_refill_time = time.time()  # Last time tokens were refilled
+            self.initialized = True
+            asyncio.create_task(self.start_refill())  # Start the refill task
 
-        while 0x01:
-            current_time = time.time_ns()
-            async with time_lock:
-                global next_time
-                
-                # Calculate how much time to wait before the next request can be sent
-                sleep_duration = max(0, next_time - current_time)
-                
-                next_time = max(next_time, current_time) + 60 / rpm
+    async def refill(self):
+        """Refills the bucket based on the time elapsed."""
+        now = time.time()
+        elapsed = now - self.last_refill_time
 
-            if sleep_duration > 0:
-                self.meta_task[f"tiktime-sleep-{iii}"] = sleep_duration
-                await asyncio.sleep(sleep_duration)
+        # Calculate the number of tokens to add
+        tokens_to_add = elapsed * self.refill_rate
 
-            elif sleep_duration <= 0:
-                self.meta_task["tiktime-bfbr"] = time.time_ns()
-                break
+        # Update the current_tokens and last_refill_time
+        if tokens_to_add > 0:
+            self.current_tokens = min(self.capacity, self.current_tokens + tokens_to_add)
+            self.last_refill_time = now
 
-            iii+=1
+    async def start_refill(self):
+        """Starts a loop to refill the bucket periodically."""
+        while True:
+            await asyncio.sleep(1)  # Wait for 1 second between refills
+            await self.refill()  # Refill tokens periodically
 
-        return self.meta_task
+    async def get_tokens(self, tokens_needed):
+        """Try to get tokens from the bucket."""
+        await self.refill()  # Refill bucket before attempting to get tokens
+
+        if tokens_needed <= self.current_tokens:
+            self.current_tokens -= tokens_needed  # Remove tokens
+            return True  # Allowed to send
+        else:
+            return False  # Not allowed to send
+
+# Global singleton instance of the TokenBucket
+bucket_instance = TokenBucket(capacity=10, refill_rate=5)
