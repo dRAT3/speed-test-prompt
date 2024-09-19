@@ -5,8 +5,10 @@ import logging
 
 import tracemalloc
 
+from tests.tests import _bench_check_malicious, _bench_score_malicious 
+
 class BenchRunner:
-    def __init__(self, tests, tm = 0x00, runs = 1):
+    def __init__(self, tests, rpm, tm = 0x00, runs = 1):
         """
         Initialize the TestRunner with the list of tests, runs, and requests per minute (rpm).
         """
@@ -77,6 +79,7 @@ class BenchRunner:
 
         for result in results:
             # Process results (currently just passing)
+            print(result)
             pass
 
         t1 = time.time_ns()
@@ -84,7 +87,7 @@ class BenchRunner:
         print(f"Time elapsed[All Runs]: {elapsed / 1e9} seconds")
 
     @classmethod
-    async def scan_file(cls):
+    async def scan_file(cls, file):
         pass
 
 # Usage Example
