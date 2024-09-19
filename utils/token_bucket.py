@@ -44,4 +44,3 @@ class TokenBucket:
 
 # Global singleton instance of the TokenBucket
 bucket_instance_groq = TokenBucket(capacity=28, refill_rate=0)
-bucket_instance_test = TokenBucket(capacity=28, refill_rate=0)

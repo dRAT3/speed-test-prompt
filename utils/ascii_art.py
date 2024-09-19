@@ -44,15 +44,32 @@ def print_art(frame, loading=False):
      {color3}/              \\        
    {color1}{toggled_bits}     {color2}{hex_value}
     """
-    print(art)
+    frame = f"""
+      {color1}O{Fore.RESET}       {Fore.RED}O{Fore.RESET}         Observe
+       {Fore.RED}O{Fore.RESET}      {Fore.YELLOW}OOO{Fore.RESET}     /
+                     .  .
+       {Fore.RED}O{Fore.RESET}       {Fore.RED}O{Fore.RESET}         
+       {Fore.RED}O{Fore.RESET}      {Fore.YELLOW}OOO{Fore.RESET}     /
+     {Fore.RED}O O{Fore.RESET}    {Fore.YELLOW}O O O{Fore.RESET}    /_____
+      {Fore.YELLOW}O O O{Fore.RESET}    {Fore.RED}O{Fore.RESET}   --\\
+       /              \\
+         /        \\________
+        /            \\
+       /              \\
+   Loading...      0x2c
+    """,
 
-def animate_art(loading=False, speed=0.1):
+    print(frame)
+
+def animate_art(loading=False, speed=0.137):
     """Function to run the animation in a separate thread."""
     global stop_animation
     frame = 0
     while not stop_animation:
         # Move the cursor back up before printing art to overwrite
-        move_cursor_up(9)  # Move up by the number of lines used by the art
+        print('\033c', end='')  # Clear the console (works in many terminals)
         print_art(frame, loading)
         time.sleep(speed)
         frame += 1
+
+animate_art(loading=False)

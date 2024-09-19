@@ -4,22 +4,24 @@ from itertools import cycle
 
 # Initialize Colorama
 init()
-def cycle_hex_and_colors():
-    hex_value = f"0x{frame % 256:02x}"  # Cycle through 00 to ff
+loading = True
 
+def cycle_hex_and_colors(state: int, frame: int):
+    #
     # Color cycling for funky effects
-    colors = cycle([Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE])
+    #colors = cycle([Fore.RED, Fore.GREEN, Fore.YELLOW, Fore.BLUE, Fore.MAGENTA, Fore.CYAN, Fore.WHITE])
     
-    if loading:
-        # Simulate "pinking" effect by alternating between magenta and red
+    if state == 0x00:
+        ld = "Loading"
+        sp = cycle(["...", ".\\.", ".-.", "./."])
+
         color1 = Fore.MAGENTA if frame % 2 == 0 else Fore.RED
         color2 = Fore.MAGENTA if frame % 2 == 1 else Fore.RED
         color3 = Fore.MAGENTA if frame % 3 == 0 else Fore.RED
-    else:
-        # Regular funky colors
-        color1 = next(colors)
-        color2 = next(colors)
-        color3 = next(colors)
+
+    colors = [color1, color2, color3]
+    
+    return colors
 
 frames_warning = [
     f"""
@@ -80,9 +82,8 @@ frames_warning = [
         /            \\
        /              \\
    Loading...-     0xcd
-    """,
-
-f"""
+    """, 
+    f"""
       {Fore.RED}O{Fore.RESET}       {Fore.RED}O{Fore.RESET}         
        {Fore.RED}O{Fore.RESET}      {Fore.YELLOW}OOO{Fore.RESET}     /
                      .  .
@@ -94,18 +95,24 @@ f"""
          /        \\________  Server
         /            \\
        /              \\
-   Ld.preloaing...\\     0x2c
-    """
-]
+   Loading...\\     0x2c
+    """]
 
+def main_buffer_cli(sample_size: int, buffer: list[int]):
+    try:
+        while True:
+            for i in range(0, sample_size):
+                colors = cycle_hex_and_colors(0x00, i)
+                
+                print('\033c', end='')  # Clear the console (works in many terminals)
+                hex_value = f"0x{i % 256:02x}"  # Cycle through 00 to ff
 
-# Loop through frames to simulate the animation
-try:
-    while True:
-        for i, frame in enumerate(frames):
-            print('\033c', end='')  # Clear the console (works in many terminals)
-            print(frame)
-            time.sleep(.111)  # Adjust timing as necessary
-except KeyboardInterrupt:
-    print('\033c', end='')  # Clear the console on exit
-    print("Animation stopped.")
+                print(frames_warning[i])
+
+                time.sleep(.137373737373737373737373737373737373737373737373737373737373737373737373737)  # Adjust timing as necessary
+
+    except KeyboardInterrupt:
+        print('\033c', end='')  # Clear the console on exit
+        print("Animation stopped.")
+
+main_buffer_cli(5, [0])

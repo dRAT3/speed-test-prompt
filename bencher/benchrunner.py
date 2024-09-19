@@ -5,7 +5,7 @@ import logging
 
 import tracemalloc
 
-from bencher.tests import _bench_check_malicious, _bench_score_malicious 
+from bencher.benches import _bench_check_malicious, _bench_score_malicious 
 from bencher.tests import _test_bucket_rate_limit_30
 
 class BenchRunner:
@@ -26,12 +26,13 @@ class BenchRunner:
         self.tm = tm
         self.logger = logging.getLogger("__name__")
 
-    def prepare_meta_task(self):
+    def prepare_meta_task(self, task_name: str):
         """
         Prepare meta_task for each test run.
         """
         self.meta_task['ray_id'] = uuid.uuid4()  # Used for creating log stream
         self.meta_task['t1'] = time.time_ns()
+        self.meta_task["name"] = task_name
 
         if self.tm == 0x00:
             return self.meta_task.copy()
@@ -65,7 +66,7 @@ class BenchRunner:
         for i, test in enumerate(self.tests):
 
             # Prepare the metadata for each test
-            meta_task = self.prepare_meta_task()
+            meta_task = self.prepare_meta_task(test.copy())
             
             # Call the function using globals
             func = globals()[test](meta_task, self.runs)
